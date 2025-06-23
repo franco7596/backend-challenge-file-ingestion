@@ -1,4 +1,4 @@
-import { ClientRecordDTO } from "../dto/clientRecord.dto";
+import { ClientRecordDTO } from '../dto/clientRecord.dto';
 
 export class Client {
   fullName: string;

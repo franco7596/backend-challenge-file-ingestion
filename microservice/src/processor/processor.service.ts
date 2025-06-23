@@ -1,20 +1,24 @@
 import fs from 'fs';
 import readline from 'readline';
-import { insertBatch } from '../database';
+import { insertBatch, executeQuery } from '../database';
 import { logger } from '../index';
 import { ClientRecordDTO } from './dto/clientRecord.dto';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Client } from './entities/client.entity';
-import { getClientTable } from './table/clientTableSchema';
+import { createTableQuery, getClientTable } from './table/clientTableSchema';
 
-const FILE_PATH = process.env.FILE_PATH || './CLIENTES_IN_0425.dat';
+const FILE_PATH = process.env.FILE_PATH || '';
 const BATCH_SIZE = 500;
 
 export async function startProcessing() {
-  const fileStream = fs.createReadStream(FILE_PATH);
-  const rl = readline.createInterface({ input: fileStream, crlfDelay: Infinity });
+  await executeQuery(createTableQuery); // Ensure the table exists before processing
   const clientTable = getClientTable();
+  const fileStream = fs.createReadStream(FILE_PATH);
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity,
+  });
 
   let batch: Client[] = []; //TODO: this do not must be a DTO
   let lineNumber = 0;
@@ -22,32 +26,44 @@ export async function startProcessing() {
 
   for await (const line of rl) {
     lineNumber++;
-    const record = await parseLine(line);
-    if (record) {
-      batch.push(record);
+    const clientData = await getClientFromText(line);
+    if (clientData) {
+      batch.push(clientData);
     } else {
       errorCount++;
       logger.warn(`Invalid line ${lineNumber}: ${line}`);
     }
 
     if (batch.length >= BATCH_SIZE) {
-      await insertBatch<Client>(batch, clientTable, (client) => client.toRow());
+      await insertBatch<Client>(batch, clientTable, (client) => client.toRow()); // TODO: Avoid awaiting insertBatch here to allow concurrent inserts and improve performance
+      //beware: not waiting for the result can cause error handling issues or overload the database if concurrency is not managed properly.
       batch = [];
     }
   }
 
   if (batch.length > 0) {
-    await insertBatch<Client>(batch, clientTable, (client) => client.toRow());
+    await insertBatch<Client>(batch, clientTable, (client) => client.toRow()); // TODO: Avoid awaiting insertBatch here to allow concurrent inserts and improve performance
+    //beware: not waiting for the result can cause error handling issues or overload the database if concurrency is not managed properly.
   }
 
-  logger.info(`✅ Processing complete. Total lines: ${lineNumber}, Errors: ${errorCount}`);
+  logger.info(
+    `✅ Processing complete. Total lines: ${lineNumber}, Errors: ${errorCount}`
+  );
 }
 
-async function parseLine(line: string): Promise<Client | undefined> {
+async function getClientFromText(line: string): Promise<Client | undefined> {
   const parts = line.split('|');
   if (parts.length < 6) return;
 
-  const [firstName, lastName, dniStr, status, entryDateStr, isPEPStr, isSubjectStr] = parts;
+  const [
+    firstName,
+    lastName,
+    dniStr,
+    status,
+    entryDateStr,
+    isPEPStr,
+    isSubjectStr,
+  ] = parts;
 
   const record = plainToInstance(ClientRecordDTO, {
     fullName: `${firstName} ${lastName}`,

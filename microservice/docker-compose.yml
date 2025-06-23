@@ -1,11 +1,11 @@
-version: "3.8"
+version: '3.8'
 
 services:
   app:
     build: .
     container_name: microservice
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       FILE_PATH: /app/CLIENTES_IN_0425.dat
       DB_HOST: sqlserver
@@ -22,10 +22,10 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: sqlserver-clientes
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
-      ACCEPT_EULA: "Y"
+      SA_PASSWORD: 'YourStrong!Passw0rd'
+      ACCEPT_EULA: 'Y'
     ports:
-      - "1433:1433"
+      - '1433:1433'
     volumes:
       - sql_data:/var/opt/mssql
 

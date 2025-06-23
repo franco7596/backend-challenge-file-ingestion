@@ -1,18 +1,28 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsOptional, IsString, IsNumber } from 'class-validator';
+import {
+  IsBoolean,
+  IsDate,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  IsInt,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ClientRecordDTO {
   @IsNotEmpty()
   @IsString()
+  @MaxLength(100)
   fullName: string;
 
   @IsNotEmpty()
   @Type(() => Number)
-  @IsNumber()
+  @IsInt()
   dni: number;
 
   @IsNotEmpty()
   @IsString()
+  @MaxLength(10)
   status: string;
 
   @IsNotEmpty()
