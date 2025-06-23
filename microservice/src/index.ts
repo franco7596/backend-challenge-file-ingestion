@@ -1,4 +1,4 @@
-import { getDbPool } from './database';
+import { connectDatabase } from './database';
 import 'dotenv-flow/config';
 import 'reflect-metadata';
 import { createApp } from './app';
@@ -17,7 +17,7 @@ app.listen(PORT, () => {
 async function main() {
   try {
     console.log('🔌 Connecting to the database...');
-    await getDbPool().connect();
+    await connectDatabase()
     console.log('✅ Database connected.');
   } catch (error) {
     console.error('❌ Error during initialization:', error);

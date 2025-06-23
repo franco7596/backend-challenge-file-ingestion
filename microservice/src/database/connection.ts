@@ -23,3 +23,18 @@ export function getDbPool(): sql.ConnectionPool {
 
   return dbPool;
 }
+
+export async function connectDatabase(maxAttempts = 10, delayMs = 3000): Promise<void> {
+  for (let i = 1; i <= maxAttempts; i++) {
+    try {
+      console.log(`🔁 Attempting DB connection (${i}/${maxAttempts})...`);
+      await getDbPool().connect();
+      console.log('✅ Database connected.');
+      return;
+    } catch (err) {
+      console.error(`❌ Attempt ${i} failed: ${err}`);
+      if (i === maxAttempts) throw err;
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+  }
+}

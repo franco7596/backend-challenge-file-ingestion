@@ -16,6 +16,7 @@
   "dependencies": {
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
+    "dotenv-flow": "^4.1.0",
     "express": "^5.1.0",
     "mssql": "^11.0.1",
     "pino": "^9.7.0",
@@ -28,7 +29,6 @@
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
     "cross-env": "^7.0.3",
-    "dotenv-flow": "^4.1.0",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.0",

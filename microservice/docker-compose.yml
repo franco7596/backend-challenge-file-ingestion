@@ -7,19 +7,18 @@ services:
     ports:
       - '3000:3000'
     environment:
-      FILE_PATH: /app/CLIENTES_IN_0425.dat
       DB_HOST: sqlserver
       DB_USER: sa
       DB_PASS: YourStrong!Passw0rd
-      DB_NAME: ClientesDB
-      PORT: 3000
+      DB_NAME: master
+      FILE_PATH: /app/CLIENTES_IN_0425.dat
     volumes:
-      - ../data-generator/challenge/CLIENTES_IN_0425.dat:/app/CLIENTES_IN_0425.dat
+      - ../data-generator/challenge/input/CLIENTES_IN_0425.dat:/app/CLIENTES_IN_0425.dat
     depends_on:
       - sqlserver
 
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sqlserver-clientes
     environment:
       SA_PASSWORD: 'YourStrong!Passw0rd'
